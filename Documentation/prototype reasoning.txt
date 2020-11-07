@@ -1,0 +1,66 @@
+Wireframe logic
+
+Execute the program:
+
+When tue user opens the platform there'll be a welcome message, the logotpe and text boxes for login with an "enter" button.
+and another button to register.
+
+Clicking on register:
+The frame opens a message asking whether the user want to register as customer or barber. with two buttons(select button box)
+and a button to Go back.
+When the user select, the fields correspondent to the option chosen will be shown on screen, and the button to submit as well.
+
+Clicking on register me: A message will be shown informing if the registration was successfull or not.
+if wasn't a button to go back will be shown, if successful, another button with same label  but to go to login page.
+--
+
+Login as barber:
+
+A screen with today's date, a table showing the first 10 to 20 entries in the hairdresser's calendar will be shown with all slots.
+There'll be buttons to navigate to past and future.
+and button for logout(go back to login section) and messages.
+
+Table content and interaction:
+A slot can be in 7 states; 
+1 -Available to be set, with text boxes and a V or X.
+2 - Unavailable, if pressed X, but can (deleted to the first state).
+3 Set as available to a Costumer waiting schedule (can be deleted).
+4 Set as reserved by an costumer, waiting for confirmation (can be deleted) (if pressed X, it goes to the second state)
+5 - Confirmed, waiting for status confirmation after theservice.
+6 -confirmed with status update as Done
+7 - confirmed with status update as no show
+-
+
+messages:
+opens a "email-like" environment, with sender's name, subject and date.
+an "open" button to open the selected message.
+and a "go back" button that opens the main barber screen.
+or write a message.
+
+If a message is open,the message content and title will be shown.
+With button to answer or delete a message.
+
+If Write a message or reply is clicked, a screen asking for name or e-mail and a text boxes for title and content, ( try to auto-fill the destiny if it's a reply).
+
+Login as Customer.
+
+the screen with welcome message and a menu with buttons to:
+Search hair dresser, View appointments, submit feedback, messages and logout.
+
+-In search hairdresser, the screen show tree text boxes to enter search data: name and location and a "go" button to search, everything will be optional.
+A table will be shown with the information inserted filtered or, if no information entered, every available slots will be shown ( around  7 per page). At the end of the table there'll be navigation buttons to future,  past, submit or go back to main menu.
+Submition button pressed the screen show a text box informing the slot was submitted, or in case no slot was selected or another problem ocurred, an error message.
+and two buttons: "Back to main menu" and "make another appointment".
+
+-in view appointments a table will be shown informing name, location,  date/time scheduled and whether it was accepted or not by the hairdresser.
+and three buttons, Cancel appointment(delete the selected appointment), make an appointment(goes to search hairdresser), and back to main menu (goes back to main menu).
+
+-Submit feedback opens a form with four text boxes: 
+name(mandatory), location(mandatory), date(optional) and a comment section.
+and two buttons: Back to main menu(goes back to menu) and Submit (goes to a message informing wheter it was successfully submited or not and two buttons: Send us another feedback(goes back to submit feedback) and go back to main menu ( goes back to main menu).
+
+-messages: same environment explained in barber.
+
+
+
+
