@@ -6,6 +6,11 @@
 package barber_shop;
 
 import java.awt.Color;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -24,17 +29,14 @@ public class Barber_Shop extends JFrame {
      */
     public static void main(String[] args) {
         
-        //Organization:
-        //Create all elements toghether, and edit them in order.       
-        
-        String userEmail;
-        String userPass;
-        
+       
+       dbConector.getConnection();
         
         //LoginPage();
-        RegisterPage();
+        //RegisterPage();
                 
     }
+    
     
     private static void LoginPage(){
             
