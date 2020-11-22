@@ -6,52 +6,80 @@
 package barber_shop;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.ButtonGroup;
+import javax.swing.ButtonModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 /**
  *
  * @author aliss
  */
-public class Barber_Shop extends JFrame {
+public class Barber_Shop extends JFrame implements ActionListener {
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         
+       //FeedBackPage();
        
        //dbConector.getConnection();
         
         // LoginPage();
         //RegisterPage();
-        //CustomerPage();
+        CustomerPage();
+        
+        
                 
     }
     
     
-    private static void LoginPage(){
-            
+    public static void LoginPage(){
+        
+        //Frame created, Panel created, E-mail label created
         JFrame frame = new JFrame();
         JPanel panel = new JPanel();
         JLabel labEmail = new JLabel("E-mail");
         JLabel labPassword = new JLabel("Password");
         JTextField txtEmail = new JTextField(20);
         JPasswordField txtPassword = new JPasswordField(20);
+        
         JButton loginButton = new JButton("Sign in");
+        loginButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                
+            }        });
+        
+        
         JButton registerButton = new JButton("Register");
-        //Frame created, Panel created, E-mail label created
+        registerButton.addActionListener(new ActionListener() {
+
+            @Override
+            //close frame and open registration page.
+            public void actionPerformed(ActionEvent e) {
+            frame.dispose();
+            Barber_Shop.RegisterPage();
+            
+            }        });
         
         frame.setSize(440, 180);
         frame.setTitle("Login into BarberShop");
@@ -81,9 +109,12 @@ public class Barber_Shop extends JFrame {
                 
         registerButton.setBounds(90, 100, 200, 30);
         //
+        
+        frame.validate();
+        frame.repaint();
     }
     
-    private static void RegisterPage(){
+    public static void RegisterPage(){
             
         
         JFrame frame = new JFrame();
@@ -107,18 +138,45 @@ public class Barber_Shop extends JFrame {
         JPasswordField txtPassword = new JPasswordField(20);
         JPasswordField txtPassword2 = new JPasswordField(20);
         
-        //Regular Buttons 
-        JButton LoginPageButton = new JButton("Go Back");
-        JButton registerButton = new JButton("Register me");
-        
         //Radio buttons group together for further selection.
-        String[] userType = {"Hairdresser", "Customer"};
-        JRadioButton hairDButton = new JRadioButton(userType[0]);
-        JRadioButton customerButton = new JRadioButton(userType[1]);
+        String[] UserType = {"Hairdresser", "Customer"};
+        JRadioButton hairDButton = new JRadioButton(UserType[0]);
+        JRadioButton customerButton = new JRadioButton(UserType[1]);
         ButtonGroup typeSelect = new ButtonGroup();
         customerButton.setSelected(true);
+        boolean userType = typeSelect.isSelected((ButtonModel) customerButton);
         typeSelect.add(hairDButton);
         typeSelect.add(customerButton);
+        
+        
+        //Login page button and actions.
+        JButton LoginPageButton = new JButton("Go Back");
+        LoginPageButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                Barber_Shop.LoginPage();
+            }        });
+        
+        //Register Button and action.
+        JButton registerButton = new JButton("Register me");
+        registerButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            
+            
+                
+                
+                dbConector.insertSt(txtName.getText(), txtSurname.getText(), txtEmail.getText(),
+            txtPhone.getText(), txtLocation.getText(), txtPassword.getSelectedText(), userType);
+            
+            
+                
+                   }   }) ;
+        
+        
         
         
         //Frame Settings
@@ -188,7 +246,7 @@ public class Barber_Shop extends JFrame {
         frame.repaint();
     }
 
-    private static void CustomerPage() {
+    public static void CustomerPage() {
         
         JFrame frame = new JFrame();
         JPanel panel = new JPanel();
@@ -200,15 +258,52 @@ public class Barber_Shop extends JFrame {
         frame.setVisible(true);
         
         
+        panel.setLayout(null);
         
         
-        JLabel welcome = new JLabel("Welcome, + Customer Name + Today is + Today's Date.");
+                JLabel welcome = new JLabel("Welcome, + Customer Name + Today is + Today's Date.");
         JLabel welcome2 = new JLabel("What would you like to do?");
         
-                JButton searchHd = new JButton("Search Hairdresser");
+        JButton searchHd = new JButton("Search Hairdresser");
+        searchHd.addActionListener(new ActionListener() {
+            
+            //close the frame and opens a Search haior Dresser page.
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+            }
+        });
+        
         JButton viewApp = new JButton("My Appointments");
+        viewApp.addActionListener(new ActionListener() {
+
+            //Close the frame and opens the Appointments
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+            }
+        });
+        
         JButton SubFb = new JButton ("Submit a Feedback");
+        SubFb.addActionListener(new ActionListener() {
+
+                //close the page and opens the feedback page.
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                Barber_Shop.FeedBackPage();
+            }        });
+       
         JButton Logout = new JButton ("Logout");
+        Logout.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+                //closes the window and open the Login page
+                frame.dispose();
+                Barber_Shop.LoginPage();
+            }        });
         
         panel.add(welcome);
         welcome.setBounds(30, 10, 400, 20);
@@ -226,7 +321,83 @@ public class Barber_Shop extends JFrame {
         
         panel.add(Logout);
         Logout.setBounds(295, 230, 80, 20);
+    
+               
+        frame.validate();
+        frame.repaint();}
+        
+    public static void FeedBackPage() {
+     
+        JFrame frame = new JFrame();
+        JPanel panel = new JPanel();
+        
+        frame.setSize(500, 500);
+        frame.setTitle("Feedback");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.add(panel);
+        frame.setVisible(true);
+        
+        panel.setVisible(true);
+        panel.setLayout(null);
+        
+        JLabel message = new JLabel("Please, inform the subject and to what Hairdresser you want write to");
+        JLabel subjectLab = new JLabel("Subject");
+        JLabel hairdLab = new JLabel("Hair Dresser");
+        
+        JTextField hairdTxt = new JTextField(20);
+        JTextField subjectTxt = new JTextField(20);
+        
+        JTextArea feedback = new JTextArea();
+        JScrollPane scroll = new JScrollPane(feedback);
+        feedback.setLineWrap(true);
+                
+        JButton goBack = new JButton("Back to Menu");
+        goBack.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+                //closes the window and open the customer main page
+                frame.dispose();
+                System.out.println("Closing operation Successful");
+                Barber_Shop.CustomerPage();
+            }        });
+        JButton SendMessage = new JButton("Send");
+                
+        panel.add(message);
+        message.setBounds(50, 10, 450, 20);
+        
+        panel.add(subjectLab);
+        subjectLab.setBounds(50, 38, 50, 20);
+        panel.add(subjectTxt);
+        subjectTxt.setBounds(100, 40, 100, 20);
+        
+        panel.add(hairdLab);
+        hairdLab.setBounds(235, 38, 80, 20);
+        panel.add(hairdTxt);
+        hairdTxt.setBounds(310, 40, 130, 20);
+        
+        panel.add(scroll);
+        scroll.setBounds(50, 70, 390, 220);
+        
+        panel.add(goBack);
+        goBack.setBounds(50, 310, 120, 30);
+        panel.add(SendMessage);
+        SendMessage.setBounds(320, 310, 120, 30);
+        
+        
+        frame.validate();
+        frame.repaint();}
+
+    @Override
+    //
+    public void actionPerformed(ActionEvent goToCustomerP) {
+        
+        
+       
+        
+        
         
     }
-    }
+}
 

@@ -9,6 +9,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 
 
@@ -25,6 +26,33 @@ public class dbConector {
             private static final String PASS = "2019142";
                         
             
+            public static Connection insertSt(String name, String surname, String email, String Phone, String Location, String Password, Boolean type){
+               
+                try {
+                    Statement stmt = getConnection().createStatement();                   
+                    stmt.execute("INSERT INTO users(name, surname, email, phone, address, password, usertype) " + "VALUES (" + name +", " + surname +", "+ email +", "
+                                + Phone +", " + Location +", "+ Password +", " + type);
+                    
+                }
+                catch (SQLException se) {
+            System.out.println("SQL Exception:");
+
+            // Loop through the SQL Exceptions
+            while (se != null) {
+                System.out.println("State  : " + se.getSQLState());
+                System.out.println("Message: " + se.getMessage());
+                System.out.println("Error  : " + se.getErrorCode());
+                
+
+                se = se.getNextException();
+            }   }
+                return null;
+                
+                
+                           
+                
+                                
+            }
             
             public static Connection getConnection(){
                             
