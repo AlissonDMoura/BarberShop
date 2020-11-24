@@ -27,10 +27,23 @@ public class dbConector {
                         
             
             public static Connection insertSt(String name, String surname, String email, String Phone, String Location, String Password, Boolean type){
-               
+               int id = 0;
+               boolean userType = false;
                 try {
+                    
+                    Statement idCheck = getConnection().createStatement();
+                    ResultSet r1 = idCheck.executeQuery("SELECT MAX(Id) FROM users");
+                    
+                    while(r1.next()){
+                        id = r1.getInt(1);
+                        id++;
+                    }
+                    System.out.println("This is my Max ID:");
+                    System.out.println(id);
+                    
+                    
                     Statement stmt = getConnection().createStatement();                   
-                    stmt.execute("INSERT INTO users(name, surname, email, phone, address, password, usertype) " + "VALUES (" + name +", " + surname +", "+ email +", "
+                    stmt.execute("INSERT INTO users(Id, name, surname, email, phone, address, password, userType) " + "VALUES ("+ id + name +", " + surname +", "+ email +", "
                                 + Phone +", " + Location +", "+ Password +", " + type);
                     
                 }

@@ -36,14 +36,14 @@ public class Barber_Shop extends JFrame implements ActionListener {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        
+        boolean userType = false;
        //FeedBackPage();
        
        //dbConector.getConnection();
         
         // LoginPage();
-        //RegisterPage();
-        CustomerPage();
+        RegisterPage();
+        //CustomerPage();
         
         
                 
@@ -116,7 +116,7 @@ public class Barber_Shop extends JFrame implements ActionListener {
     
     public static void RegisterPage(){
             
-        
+                
         JFrame frame = new JFrame();
         JPanel panel = new JPanel();
         
@@ -139,15 +139,36 @@ public class Barber_Shop extends JFrame implements ActionListener {
         JPasswordField txtPassword2 = new JPasswordField(20);
         
         //Radio buttons group together for further selection.
+                
+             
         String[] UserType = {"Hairdresser", "Customer"};
         JRadioButton hairDButton = new JRadioButton(UserType[0]);
         JRadioButton customerButton = new JRadioButton(UserType[1]);
         ButtonGroup typeSelect = new ButtonGroup();
         customerButton.setSelected(true);
-        boolean userType = typeSelect.isSelected((ButtonModel) customerButton);
         typeSelect.add(hairDButton);
         typeSelect.add(customerButton);
         
+        //Add Location just for barbers.
+        hairDButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                customerButton.setSelected(false);
+                hairDButton.setSelected(true);
+                panel.add(labLocation); panel.add(txtLocation);
+                frame.show();}
+        });
+        //Remove location for Customers.
+        customerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                customerButton.setSelected(false);
+                hairDButton.setSelected(true);
+                panel.remove(labLocation); panel.remove(txtLocation);
+                frame.show();         }
+        });
         
         //Login page button and actions.
         JButton LoginPageButton = new JButton("Go Back");
@@ -166,11 +187,19 @@ public class Barber_Shop extends JFrame implements ActionListener {
             @Override
             public void actionPerformed(ActionEvent e) {
             
-            
+                             if(customerButton.isSelected()){
+                             System.out.println("Customer Selected");
+                             dbConector.insertSt(txtName.getText(), txtSurname.getText(), txtEmail.getText(),txtPhone.getText(),
+                             txtLocation.getText(), txtPassword.getText(), false);}
+                             
+                             else{
+                             System.out.println("Barber Selected");
+                             dbConector.insertSt(txtName.getText(), txtSurname.getText(), txtEmail.getText(),txtPhone.getText(),
+                             txtLocation.getText(), txtPassword.getText(), true);}
                 
                 
-                dbConector.insertSt(txtName.getText(), txtSurname.getText(), txtEmail.getText(),
-            txtPhone.getText(), txtLocation.getText(), txtPassword.getSelectedText(), userType);
+            //dbConector.insertSt(txtName.getText(), txtSurname.getText(), txtEmail.getText(),txtPhone.getText(),
+            //txtLocation.getText(), txtPassword.getText(), false);
             
             
                 
@@ -216,8 +245,9 @@ public class Barber_Shop extends JFrame implements ActionListener {
         
         labLocation.setBounds(20, 170, 80, 20);
         txtLocation.setBounds(110, 170, 200, 20);
-        panel.add(labLocation);
-        panel.add(txtLocation);
+        
+        if(hairDButton.isSelected()){
+            panel.add(labLocation); panel.add(txtLocation);}
         
         labPassword.setBounds(20, 200, 80, 20);
         txtPassword.setBounds(110, 200, 200, 20);
