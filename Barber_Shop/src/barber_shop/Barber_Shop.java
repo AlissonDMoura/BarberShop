@@ -14,11 +14,14 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ButtonGroup;
 import javax.swing.ButtonModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
@@ -41,7 +44,7 @@ public class Barber_Shop extends JFrame implements ActionListener {
        
        //dbConector.getConnection();
         
-        // LoginPage();
+        //LoginPage();
         RegisterPage();
         //CustomerPage();
         
@@ -63,22 +66,53 @@ public class Barber_Shop extends JFrame implements ActionListener {
         JButton loginButton = new JButton("Sign in");
         loginButton.addActionListener(new ActionListener() {
 
+            
+            //SIGN in Button action
             @Override
             public void actionPerformed(ActionEvent e) {
-                frame.dispose();
                 
-            }        });
+                try {
+                    
+                    // Check what type of user was entered
+                    String userType="";
+                    Statement typeCheck = dbConector.getConnection().createStatement();
+                   
+                    ResultSet utype;               
+                    utype = typeCheck.executeQuery("Select userType from users where Id =" +
+                            dbConector.userLogin(txtEmail.getText(), String.valueOf(txtPassword.getPassword())));
+                    while(utype.next()){
+                        userType = utype.getString(1);
+                    }
+                    System.out.println("ecred = " + userType);
+                    
+                    
+                    //Directs the user to it's respective Page.
+                if(userType.equals("false")){
+                    //This opens the customer page with the customer's ID, and close the login page.
+                    frame.dispose();
+                    CustomerPage(dbConector.userLogin(txtEmail.getText(), String.valueOf(txtPassword.getPassword())));
+                    
+                }
+                    else{
+                    //This opens the barber page with the user's id.
+                    System.out.println("No barber supported page, please wait");
+                        
+                    };
+                } catch (SQLException ex) {
+                    System.out.println("This shouldn't have happened, please check your connection");;
+                } }        });
         
         
         JButton registerButton = new JButton("Register");
         registerButton.addActionListener(new ActionListener() {
 
             @Override
+            
             //close frame and open registration page.
             public void actionPerformed(ActionEvent e) {
-            frame.dispose();
-            Barber_Shop.RegisterPage();
-            
+                frame.dispose();
+                        Barber_Shop.RegisterPage();
+               
             }        });
         
         frame.setSize(440, 180);
@@ -139,8 +173,6 @@ public class Barber_Shop extends JFrame implements ActionListener {
         JPasswordField txtPassword2 = new JPasswordField(20);
         
         //Radio buttons group together for further selection.
-                
-             
         String[] UserType = {"Hairdresser", "Customer"};
         JRadioButton hairDButton = new JRadioButton(UserType[0]);
         JRadioButton customerButton = new JRadioButton(UserType[1]);
@@ -149,7 +181,7 @@ public class Barber_Shop extends JFrame implements ActionListener {
         typeSelect.add(hairDButton);
         typeSelect.add(customerButton);
         
-        //Add Location just for barbers.
+        //Add Location when barber is selected
         hairDButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -159,18 +191,19 @@ public class Barber_Shop extends JFrame implements ActionListener {
                 panel.add(labLocation); panel.add(txtLocation);
                 frame.show();}
         });
-        //Remove location for Customers.
+        //Remove location when Customer is selected.
         customerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 frame.dispose();
-                customerButton.setSelected(false);
-                hairDButton.setSelected(true);
+                customerButton.setSelected(true);
+                hairDButton.setSelected(false);
                 panel.remove(labLocation); panel.remove(txtLocation);
-                frame.show();         }
+                frame.show();
+                }
         });
         
-        //Login page button and actions.
+        //Go back to login page, close the actual frame.
         JButton LoginPageButton = new JButton("Go Back");
         LoginPageButton.addActionListener(new ActionListener() {
 
@@ -180,29 +213,32 @@ public class Barber_Shop extends JFrame implements ActionListener {
                 Barber_Shop.LoginPage();
             }        });
         
-        //Register Button and action.
+        //Register Button actions, details inside.
         JButton registerButton = new JButton("Register me");
         registerButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
             
+                //this first 'if' block check if the password is the same before registration
+                
+                if(String.valueOf(txtPassword.getPassword()).equals(String.valueOf(txtPassword2.getPassword()))){
+                    
+                // this block checks if the user is registrating as barber or as a customer, and then register them into the database
                              if(customerButton.isSelected()){
                              System.out.println("Customer Selected");
                              dbConector.insertSt(txtName.getText(), txtSurname.getText(), txtEmail.getText(),txtPhone.getText(),
-                             txtLocation.getText(), txtPassword.getText(), false);}
+                             txtLocation.getText(), String.valueOf(txtPassword.getPassword()), "'false'");}
                              
                              else{
                              System.out.println("Barber Selected");
                              dbConector.insertSt(txtName.getText(), txtSurname.getText(), txtEmail.getText(),txtPhone.getText(),
-                             txtLocation.getText(), txtPassword.getText(), true);}
-                
-                
-            //dbConector.insertSt(txtName.getText(), txtSurname.getText(), txtEmail.getText(),txtPhone.getText(),
-            //txtLocation.getText(), txtPassword.getText(), false);
-            
-            
-                
+                             txtLocation.getText(), String.valueOf(txtPassword.getPassword()), "'true'");}
+                } else {
+                    txtPassword.setText(null);
+                    txtPassword2.setText(null);
+                    
+                    JOptionPane.showMessageDialog(frame, "Please re-enter your password, it's different");}
                    }   }) ;
         
         
@@ -276,7 +312,7 @@ public class Barber_Shop extends JFrame implements ActionListener {
         frame.repaint();
     }
 
-    public static void CustomerPage() {
+    public static void CustomerPage(int id) throws SQLException {
         
         JFrame frame = new JFrame();
         JPanel panel = new JPanel();
@@ -290,8 +326,33 @@ public class Barber_Shop extends JFrame implements ActionListener {
         
         panel.setLayout(null);
         
+        String name = "";
+        String surname = "";
         
-                JLabel welcome = new JLabel("Welcome, + Customer Name + Today is + Today's Date.");
+        
+                    //Personalize our Customer with name and other related data
+                    Statement credCheck;              
+                    credCheck = dbConector.getConnection().createStatement();
+                
+                    ResultSet cName;               
+                    cName = credCheck.executeQuery("Select name from users where Id = " + id);
+                    while(cName.next()){
+                        name = cName.getString(1);
+                    }
+                    System.out.println("name = " + name);
+                    
+                    ResultSet cSurName;               
+                    cSurName = credCheck.executeQuery("Select surname from users where Id = " + id);
+                    while(cSurName.next()){
+                        surname = cSurName.getString(1);
+                    }
+                    System.out.println("surname = " + surname);
+                    System.out.println("id =" + id);
+                    
+                    
+        
+        
+                JLabel welcome = new JLabel("Welcome, "+ name +" " + surname +" Today is + Today's Date.");
         JLabel welcome2 = new JLabel("What would you like to do?");
         
         JButton searchHd = new JButton("Search Hairdresser");
@@ -363,6 +424,7 @@ public class Barber_Shop extends JFrame implements ActionListener {
         
         frame.setSize(500, 500);
         frame.setTitle("Feedback");
+        
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(panel);
         frame.setVisible(true);
@@ -422,12 +484,7 @@ public class Barber_Shop extends JFrame implements ActionListener {
     @Override
     //
     public void actionPerformed(ActionEvent goToCustomerP) {
+               
         
-        
-       
-        
-        
-        
-    }
-}
+    } }
 

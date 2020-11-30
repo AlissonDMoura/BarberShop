@@ -10,12 +10,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 
 /**
  *
- * @author aliss
+ * @author alisson Moura
  */
 public class dbConector {
             
@@ -26,9 +28,10 @@ public class dbConector {
             private static final String PASS = "2019142";
                         
             
-            public static Connection insertSt(String name, String surname, String email, String Phone, String Location, String Password, Boolean type){
+            public static Connection insertSt(String name, String surname, String email,
+            String Phone, String Location, String Password, String type){
                int id = 0;
-               boolean userType = false;
+               
                 try {
                     
                     Statement idCheck = getConnection().createStatement();
@@ -38,15 +41,19 @@ public class dbConector {
                         id = r1.getInt(1);
                         id++;
                     }
-                    System.out.println("This is my Max ID:");
+                    System.out.println("This is my Next ID:");
                     System.out.println(id);
                     
+                                        
                     
                     Statement stmt = getConnection().createStatement();                   
-                    stmt.execute("INSERT INTO users(Id, name, surname, email, phone, address, password, userType) " + "VALUES ("+ id + name +", " + surname +", "+ email +", "
-                                + Phone +", " + Location +", "+ Password +", " + type);
-                    
-                }
+                    stmt.execute("INSERT INTO users (Id, name, surname, email, phone, address, password, userType)\n" +
+                                "VALUES ( "+ id +", '"+ name +"', '" + surname +"', '"+ email +"', '"+ Phone +"', '" + Location +
+                                "', '"+ Password +"', " + type +")");
+                                        
+                    idCheck.close();
+                    r1.close();                }
+                
                 catch (SQLException se) {
             System.out.println("SQL Exception:");
 
@@ -59,13 +66,8 @@ public class dbConector {
 
                 se = se.getNextException();
             }   }
-                return null;
                 
-                
-                           
-                
-                                
-            }
+                return null;}
             
             public static Connection getConnection(){
                             
@@ -86,40 +88,55 @@ public class dbConector {
                 
             }
            
-            //close connection in three steps. the third constructior initialize the second that initialize the first. (less code this way)
-            public static void closeConnection(Connection conn) {
+            public static int userLogin(String email, String password) throws SQLException{
+                                         
+                String Email = "inalterado";
+                String Pass = "noti alteredi";
+                int id = 0;
+                String User = "Blank";
+              
+                    Statement credCheck;              
+                    credCheck = getConnection().createStatement();
                 
-                if (conn != null){
-                    try {
-                        conn.close();
-                    } catch (SQLException ex) {
-                        System.err.println("Error: CloseConnection on conn" + ex);// Red console error
+                    ResultSet ecred;               
+                    ecred = credCheck.executeQuery("Select email from users where password = '" + password +"' and email = '"+email+"'");
+                    while(ecred.next()){
+                        Email = ecred.getString(1);
                     }
+                    System.out.println("ecred = " + Email);
+               
+                    ResultSet pcred;
+                    pcred = credCheck.executeQuery("Select password from users where password = '" + password +"' and email = '"+email+"'");
+                    while(pcred.next()){
+                        Pass = pcred.getString(1);
+                    }                    
+                    System.out.println("pcred = " + Pass);
+                    
+                    ResultSet idcred;
+                    idcred = credCheck.executeQuery("Select Id from users where password = '" + password +"' and email = '"+email+"'");
+                    while(idcred.next()){
+                        id = idcred.getInt(1);
+                    }                    
+                    System.out.println("idcred = " + id);
+                                        
+                    ResultSet userType;
+                    userType = credCheck.executeQuery("Select userType from users where Id = " + id);
+                    while(userType.next()){
+                    User = userType.getString(1);
                     }
-                    }   
-            public static void closeConnection(Connection conn, PreparedStatement st) {
+                    System.out.println("User type is " +User);
+                                        
+                    if(Pass.equals(password) && Email.equals(email)){
+                        System.out.println("credentials checked");
+                        
+                        ;}
+                    
+                    else {
+                        System.out.println("Access Denied - Credentials don't Match");
+                                                ;
+                    }            
+                return id; 
                 
-                if (st != null){
-                    try {
-                        st.close();
-                    } catch (SQLException ex) {
-                        System.err.println("Error: CloserConnection on st  " + ex);// Red console error
-                    }
-                    }
-                closeConnection(conn);
-                    }   
-            public static void closeConnection(Connection conn, PreparedStatement st, ResultSet rs) {
-                
-                if (rs != null){
-                    try {
-                        rs.close();
-                    } catch (SQLException ex) {
-                        System.err.println("Error: on rs" + ex);// Red console error
-                    }
-                    }
-                closeConnection(conn, st);
-                
-                    }   
+ } 
 }
-
  
