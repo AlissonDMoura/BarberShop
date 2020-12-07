@@ -135,8 +135,76 @@ public class dbConector {
                         System.out.println("Access Denied - Credentials don't Match");
                                                 ;
                     }            
-                return id; 
+                return id;  } 
+
+            public static Connection insertApp(String date, String hour, String hdresser, String location){
+                    
+                try {                    
+                    int id =0;
+                    
+                    Statement idCheck = getConnection().createStatement();
+                    ResultSet r1 = idCheck.executeQuery("SELECT MAX(id) FROM appointments");
+                    
+                    while(r1.next()){
+                        id = r1.getInt(1);
+                        id++;
+                    }
+                    System.out.println("This is my Next ID:");
+                    System.out.println(id);
+                    
+                    
+                    Statement stmt = getConnection().createStatement();                   
+                    stmt.execute("INSERT INTO appointments (id, date, hour, hair_dresser, location, customer, confirm, status)\n" +
+                                "VALUES ( "+ id +", '"+ date +"', '" + hour +"', '"+ hdresser +"', '"+ location +"', 'vacant','','vacant')");
+                                        
+                    idCheck.close();
+                    r1.close();                }
                 
- } 
+                catch (SQLException se) {
+            System.out.println("SQL Exception:");
+
+            // Loop through the SQL Exceptions
+            while (se != null) {
+                System.out.println("State  : " + se.getSQLState());
+                System.out.println("Message: " + se.getMessage());
+                System.out.println("Error  : " + se.getErrorCode());
+                
+
+                se = se.getNextException();                
+            }   }
+                
+                return null;            }
+            
+            public static int[] viewAppH(String d1, String d2, String d3, String d4, String d5) throws SQLException{
+                
+                //This code will query the next 5 appointments, sorted by date and save it's ID's in Ascendent order into a array.
+                
+                
+                    Statement tContent;              
+                    tContent = getConnection().createStatement();
+                    
+                    int[] ids = new int[6];
+                    
+                    
+                    ResultSet idValue;               
+                    idValue = tContent.executeQuery("Select id from appointments where date ='"+ d1 +"' or date ='"+d2+"' or date ='"+d3
+                                                    +"' or date ='"+d4+"' or date ='"+d5+"' ORDER by date ASC, hour asc;");
+                    
+                    int i = 0;
+                    while(idValue.next()){
+                        ids[i] = idValue.getInt(1);
+                        i++;
+
+            }
+                    System.out.println("id1 = " + ids[0]);
+                    System.out.println("id2 = " + ids[1]);
+                    System.out.println("id3 = " + ids[2]);
+                    System.out.println("id4 = " + ids[3]);
+                    System.out.println("id5 = " + ids[4]);
+            return ids;
+            
+            
+            
+}
 }
  

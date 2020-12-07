@@ -5,20 +5,23 @@
  */
 package barber_shop;
 
-import java.awt.Color;
+
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ButtonGroup;
-import javax.swing.ButtonModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -26,28 +29,31 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 /**
  *
  * @author aliss
  */
-public class Barber_Shop extends JFrame implements ActionListener {
+public class Barber_Shop extends JFrame {
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
-        boolean userType = false;
-       //FeedBackPage();
-       
-       //dbConector.getConnection();
+    public static void main(String[] args) throws SQLException {
         
+        //For easy navigation through the Code, please click on every '-' for all blocks, and expand the block you're going to analyse.
+        
+        
+        //FeedBackPage();
         //LoginPage();
-        RegisterPage();
+        //RegisterPage();
         //CustomerPage();
-        
+        //MyAppointments(6);
+        HairDresserPanel(7);
         
                 
     }
@@ -57,6 +63,7 @@ public class Barber_Shop extends JFrame implements ActionListener {
         
         //Frame created, Panel created, E-mail label created
         JFrame frame = new JFrame();
+        frame.setLocationRelativeTo(null);
         JPanel panel = new JPanel();
         JLabel labEmail = new JLabel("E-mail");
         JLabel labPassword = new JLabel("Password");
@@ -152,6 +159,7 @@ public class Barber_Shop extends JFrame implements ActionListener {
             
                 
         JFrame frame = new JFrame();
+        frame.setLocationRelativeTo(null);
         JPanel panel = new JPanel();
         
         //All Labels
@@ -315,6 +323,7 @@ public class Barber_Shop extends JFrame implements ActionListener {
     public static void CustomerPage(int id) throws SQLException {
         
         JFrame frame = new JFrame();
+        frame.setLocationRelativeTo(null);
         JPanel panel = new JPanel();
         
         frame.setSize(400, 300);
@@ -326,6 +335,8 @@ public class Barber_Shop extends JFrame implements ActionListener {
         
         panel.setLayout(null);
         
+        DateFormat DFdate = new SimpleDateFormat("dd-MM-yyyy");
+        String Sdate = DFdate.format(new Date());
         String name = "";
         String surname = "";
         
@@ -352,7 +363,7 @@ public class Barber_Shop extends JFrame implements ActionListener {
                     
         
         
-                JLabel welcome = new JLabel("Welcome, "+ name +" " + surname +" Today is + Today's Date.");
+                JLabel welcome = new JLabel("Welcome, "+ name +" " + surname +" Today is " + Sdate);
         JLabel welcome2 = new JLabel("What would you like to do?");
         
         JButton searchHd = new JButton("Search Hairdresser");
@@ -382,7 +393,7 @@ public class Barber_Shop extends JFrame implements ActionListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 frame.dispose();
-                Barber_Shop.FeedBackPage();
+                Barber_Shop.FeedBackPage(id);
             }        });
        
         JButton Logout = new JButton ("Logout");
@@ -417,9 +428,10 @@ public class Barber_Shop extends JFrame implements ActionListener {
         frame.validate();
         frame.repaint();}
         
-    public static void FeedBackPage() {
+    public static void FeedBackPage(int id) {
      
         JFrame frame = new JFrame();
+        frame.setLocationRelativeTo(null);
         JPanel panel = new JPanel();
         
         frame.setSize(500, 500);
@@ -444,16 +456,14 @@ public class Barber_Shop extends JFrame implements ActionListener {
         feedback.setLineWrap(true);
                 
         JButton goBack = new JButton("Back to Menu");
-        goBack.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                
+        goBack.addActionListener((ActionEvent e) -> {
+            try {
                 //closes the window and open the customer main page
                 frame.dispose();
-                System.out.println("Closing operation Successful");
-                Barber_Shop.CustomerPage();
-            }        });
+                Barber_Shop.CustomerPage(id);
+            } catch (SQLException ex) {
+                System.out.println("Error at login back, please close the program");                }
+        });
         JButton SendMessage = new JButton("Send");
                 
         panel.add(message);
@@ -481,10 +491,232 @@ public class Barber_Shop extends JFrame implements ActionListener {
         frame.validate();
         frame.repaint();}
 
-    @Override
-    //
-    public void actionPerformed(ActionEvent goToCustomerP) {
-               
+    public static void MyAppointments(int id) throws SQLException{
+                
+        JFrame frame = new JFrame();
+        frame.setLocationRelativeTo(null);
+        JPanel panel = new JPanel();
         
-    } }
+        frame.setSize(500, 500);
+        frame.setTitle("My Appointments");
+        
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.add(panel);
+        frame.setVisible(true);
+        frame.validate();
+        frame.repaint();
+        panel.setVisible(true);
+        panel.setLayout(null);
+        
+                    //Retrieve user information from the database.
+                    String name = "";
+                    String surname = "";
+                
+                    Statement credCheck;              
+                    credCheck = dbConector.getConnection().createStatement();
+                
+                    ResultSet cName;               
+                    cName = credCheck.executeQuery("Select name from users where Id = " + id);
+                    while(cName.next()){
+                        name = cName.getString(1);                    }
+                                       
+                    ResultSet cSurName;               
+                    cSurName = credCheck.executeQuery("Select surname from users where Id = " + id);
+                    while(cSurName.next()){
+                        surname = cSurName.getString(1);                    }
+                    
+                    
+                    
+        
+                    // frame components:
+        JLabel info1 = new JLabel("Dear "+ name + ", this is your next five appointments.", SwingConstants.CENTER);
+        JLabel info2 = new JLabel("You can navigate and cancel appointments here.", SwingConstants.CENTER);
+        
+        
+        
+        String[] columnNames = {"Hairdresser", "Location", "Date", "Time"};
+        String[][] data ={
+                                {"Leila", "Jacana", "20/07", "1"},
+                                {"Leila", "Jacana", "20/07", "2"},
+                                {"Leila", "Jacana", "20/07", "3"},
+                                {"Leila", "Jacana", "20/07", "4"},
+                                {"Leila", "Jacana", "20/07", "5"}
+    };
+        
+    
+        
+        JTable table = new JTable(data, columnNames);
+        table.setBounds(80,100,299,80);
+        table.setEnabled(false);
+        
+        JScrollPane sp = new JScrollPane(table);
+        sp.setBounds(70, 100, 319, 80);
+        
+        panel.add(info1);
+        info1.setBounds(50, 20,400,20);
+        panel.add(info2);
+        info2.setBounds(50, 40,400,20);
+                
+        panel.add(sp);
+        
+        //Button to Go back.
+        JButton goBack = new JButton("Go to Menu");
+        goBack.addActionListener((ActionEvent e) -> {
+            try {
+                frame.dispose();
+                Barber_Shop.CustomerPage(id);
+            } catch (SQLException ex) {
+                System.out.println("Error loging back, please try login again");           }        });
+        
+        
+        panel.add(goBack);
+        goBack.setBounds(200, 350, 100, 80);}
 
+    public static void HairDresserPanel(int id) throws SQLException {
+        //It will bring the ID selection from the login page to personalize the user experience.
+        
+         JFrame frame = new JFrame();
+        frame.setLocationRelativeTo(null);
+        JPanel panel = new JPanel();
+        
+        frame.setSize(500, 500);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.add(panel);
+        frame.setVisible(true);
+        //Frame creation and setup
+        
+        panel.setLayout(null);
+        //layout by coordinates
+        
+                DateFormat DFdate = new SimpleDateFormat("dd/MM/yyyy");
+                String Sdate = DFdate.format(new Date());
+                String date1 = Sdate;
+                //Collect System's date
+                
+        String hairDresser = "";
+        String hsurname = "";
+        String location = "";
+        
+                    //Personalize our Customer with name and other related data
+                    Statement credCheck;              
+                    credCheck = dbConector.getConnection().createStatement();
+                
+                    ResultSet hName;               
+                    hName = credCheck.executeQuery("Select name from users where Id = " + id);
+                    while(hName.next()){
+                        hairDresser = hName.getString(1);
+                    }
+                    System.out.println("name = " + hairDresser);
+                    
+                    ResultSet hSurName;               
+                    hSurName = credCheck.executeQuery("Select surname from users where Id = " + id);
+                    while(hSurName.next()){
+                        hsurname = hSurName.getString(1);
+                    }
+                    
+                    ResultSet hlocation;               
+                    hlocation = credCheck.executeQuery("Select address from users where Id = " + id);
+                    while(hlocation.next()){
+                        location = hlocation.getString(1);
+                    }
+                    final String myName = hairDresser;
+                    final String myLoc = location;
+                    //Final Strings as the class that will call it only accept final strings.
+                    
+                    
+                    System.out.println("surname = " + hsurname);
+                    System.out.println("id =" + id);
+                    //terminal confirm the Credentials for the programmer.
+                    
+                    frame.setTitle("Hairdresser: "+ hairDresser);
+        
+
+        
+                    
+        JLabel welcome = new JLabel("Welcome, "+ hairDresser +" " + hsurname +" Today is " + Sdate);
+        JLabel newAgenda = new JLabel("Choose your next vacant time, accept or decline a appointment");
+        JLabel OtherApp = new JLabel("Your apointments");
+        JLabel Ldate = new JLabel("Date");
+        JLabel Lhour = new JLabel("Hour");
+              
+        JButton upApp = new JButton("Set to Database");
+                
+        //To avoid tiping mistakes, I'll provide the data to be entered
+        String [] hourString = {"9:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00"};
+        JComboBox hourList = new JComboBox(hourString);
+        hourList.setSelectedIndex(0);
+        
+        
+        String [] dateString = {"","","","","","","","","",""};
+        int i= 0;
+        
+        //To avoid mistakes, I'll provide the possible dates, the hairdresser can select 10 days counting from the actual day.      
+        while(i != 10 ){
+             try {dateString[i] = date1;
+                 Calendar c = Calendar.getInstance();
+                 c.setTime(DFdate.parse(date1));
+                 c.add(Calendar.DATE, 1);
+                 date1 = DFdate.format(c.getTime());
+                 i++;} catch (ParseException ex) {System.out.println("Error inside the loop for Date ComboBox");      } }
+        
+        JComboBox dateList = new JComboBox(dateString);
+        dateList.setSelectedIndex(0);
+        
+        
+        
+        //Set Appointment Button, shows a dialog for confirmation and writes into the database.
+        upApp.addActionListener(new ActionListener() {
+
+            
+            
+             @Override
+             public void actionPerformed(ActionEvent e) {
+                 
+                 int result;                                  
+                 result = JOptionPane.showConfirmDialog(frame,"You've selected day: " + dateList.getSelectedItem() + " and time: " + hourList.getSelectedItem() + "?","Confirm appointment!", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if(result == JOptionPane.YES_OPTION){
+                System.out.println("YES");
+                dbConector.insertApp(dateList.getSelectedItem().toString(), hourList.getSelectedItem().toString(), myName, myLoc);
+                JOptionPane.showMessageDialog(frame,"Your appointment was successfuly done!");}
+            else {System.out.println("No action taken");};}          });
+        
+        
+        int[] idAppointment = dbConector.viewAppH(dateString[0], dateString[1], dateString[2], dateString[3], dateString[4]);
+        
+                //What i'm going to display:
+                JTextField dDate1 = new JTextField();
+                JTextField dHour1 = new JTextField();
+                JTextField dhair_dresser = new JTextField();
+        
+        
+        
+        
+        
+        //Add objects into the frame.        
+        panel.add(welcome);
+        welcome.setBounds(100, 20, 400, 20);
+        panel.add(newAgenda);
+        newAgenda.setBounds(60, 40, 400, 20);
+        panel.add(Ldate);
+        Ldate.setBounds(50, 100, 50, 20);
+        panel.add(Lhour);
+        Lhour.setBounds(200, 100, 50, 20);
+        panel.add(OtherApp);
+        OtherApp.setBounds(50, 160, 120, 20);
+               
+        panel.add(hourList);
+        hourList.setBounds(250, 100, 80, 20);
+        panel.add(dateList);
+        dateList.setBounds(100, 100, 80, 20);
+        
+        panel.add(upApp);
+        upApp.setBounds(340, 90, 130, 40);
+        
+        
+        
+    }
+
+    
+
+}
+ 
